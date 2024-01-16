@@ -1,5 +1,5 @@
 import subprocess
-from tuning import *
+from tunning import *
 from autotune import *
 
 subprocess.run(['python', 'tuning.py'])
