@@ -17,15 +17,17 @@ class MusicApp:
         self.autotuned_audio = None
         self.original_audio = None
         self.audio_stream = None
-        self.playback_thread = None 
-
-        
+        self.playback_thread = None  
         self.create_widgets()
 
     def create_widgets(self):
         # Canvas for visual representation or screen
         self.canvas = tk.Canvas(self.master, bg="white", height=200, width=500)
         self.canvas.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+        # Generate Melody Button
+        generate_melody_button = tk.Button(self.master, text="Generate Melody", command=self.generate_melody)
+        generate_melody_button.grid(row=0, column=2, padx=10, pady=10, sticky="ne")
 
         # Recording Frame
         recording_frame = tk.Frame(self.master, padx=10, pady=10)
@@ -62,6 +64,12 @@ class MusicApp:
         # Play Original Button
         play_original_button = tk.Button(playback_frame, text="Play Original", command=self.play_original)
         play_original_button.pack(side=tk.LEFT)
+
+        for i in range(3):
+            self.master.columnconfigure(i, weight=1)
+
+        self.master.rowconfigure(0, weight=1)
+        self.master.rowconfigure(1, weight=1)
 
     def toggle_recording(self):
         if not self.is_recording:
@@ -108,34 +116,32 @@ class MusicApp:
             wf.setframerate(44100)
             wf.writeframes(b"".join(self.recorded_frames))
             wf.close()
-
             self.original_audio = AudioSegment.from_wav(file_path)
             self.play_original()  
 
     def display_autotune_pitch(self):
         if self.original_audio is not None:
-            
+            # Autotune the original audio
             self.autotuned_audio = self.autotune_audio(self.original_audio)
-           
+            #logic to display autotune pitch
 
     def display_original_pitch(self):
-       
+        #logic to display original pitch
         pass
 
     def play_autotune(self):
         if self.autotuned_audio is not None:
-            self.stop_playback() 
+            self.stop_playback()  
             self.playback_thread = threading.Thread(target=self.play_audio, args=(self.autotuned_audio,))
             self.playback_thread.start()
 
     def play_original(self):
         if self.original_audio is not None:
-            self.stop_playback() 
+            self.stop_playback()  
             self.playback_thread = threading.Thread(target=self.play_audio, args=(self.original_audio,))
             self.playback_thread.start()
 
     def stop_playback(self):
-        
         if self.is_playing and self.playback_thread.is_alive():
             self.playback_thread.join()  
             self.is_playing = False
@@ -145,16 +151,18 @@ class MusicApp:
         play(audio)
 
     def autotune_audio(self, audio):
-        #Add the code for autotuning audeo here, below is just sample code
-        autotuned_audio = audio.speedup(playback_speed=1.5)  
+        autotuned_audio = audio.speedup(playback_speed=1.5) 
         return autotuned_audio
 
     def check_recording_status(self):
-       
         if self.is_recording:
             self.master.after(100, self.check_recording_status)
         else:
             self.stop_button.config(state=tk.DISABLED)
+
+    def generate_melody(self):
+        # logic to generate melody
+        pass
 
 if __name__ == "__main__":
     root = tk.Tk()
