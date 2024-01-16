@@ -95,7 +95,7 @@ def play_tone(frequency, duration, sample_rate):
     pygame.mixer.quit()
 
 
-def tuning_main():
+def tunning_main():
     # Set the duration of the recording (in seconds)
     duration = 3 # 1 minute
 
@@ -122,4 +122,4 @@ def tuning_main():
     print(f"Recorded sound saved to: {save_path}")
 
 if __name__ == '__main__':
-    tuning_main()
+    tunning_main()
