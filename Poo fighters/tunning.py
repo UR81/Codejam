@@ -95,28 +95,31 @@ def play_tone(frequency, duration, sample_rate):
     pygame.mixer.quit()
 
 
+def tunning_main():
+    # Set the duration of the recording (in seconds)
+    duration = 3 # 1 minute
 
-# Set the duration of the recording (in seconds)
-duration = 10 # 1 minute
+    # Set the sample rate
+    sample_rate = 44100
 
-# Set the sample rate
-sample_rate = 44100
+    # Set the path to save the recorded sound
+    save_path = r'D:\codejam4\aryan_codejam\Codejam\Poo fighters\song.wav'
 
-# Set the path to save the recorded sound
-save_path = r'D:\codejam4\codejam-v4\submissions\Codejam\song.wav'
+    # Record audio from the microphone and save to a file
+    audio_signal = record_audio(duration, sample_rate, save_path)
 
-# Record audio from the microphone and save to a file
-audio_signal = record_audio(duration, sample_rate, save_path)
+    # Visualize the recorded audio signal
+    plot_audio_signal(audio_signal, sample_rate)
 
-# Visualize the recorded audio signal
-plot_audio_signal(audio_signal, sample_rate)
+    # Find the dominant frequency in the signal
+    dominant_frequency = find_dominant_frequency(audio_signal, sample_rate)
 
-# Find the dominant frequency in the signal
-dominant_frequency = find_dominant_frequency(audio_signal, sample_rate)
+    print(f"Dominant Frequency: {dominant_frequency} Hz")
 
-print(f"Dominant Frequency: {dominant_frequency} Hz")
+    # Play a tone based on the tuning result
 
-# Play a tone based on the tuning result
+    # Print the path to the saved recording
+    print(f"Recorded sound saved to: {save_path}")
 
-# Print the path to the saved recording
-print(f"Recorded sound saved to: {save_path}")
+if __name__ == '__main__':
+    tunning_main()
