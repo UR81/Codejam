@@ -86,7 +86,8 @@ class MusicApp:
 
 
     def generate_melody(self):
-        pass
+        external_script_path = "./AI_Melody/mgen.py"
+        subprocess.run(["python", external_script_path])
     
     def animate_gif(self):
         self.gif_index = (self.gif_index + 1) % len(self.gif_frames)
