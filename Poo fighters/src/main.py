@@ -88,17 +88,24 @@ class MusicApp:
     def generate_melody(self):
         pass
     
+
+# Increment gif index, update canvas with next frame, and schedule recursive animation.
     def animate_gif(self):
         self.gif_index = (self.gif_index + 1) % len(self.gif_frames)
         self.canvas.itemconfig(self.gif_object, image=self.gif_frames[self.gif_index])
         self.master.after(self.animation_interval, self.animate_gif)
     
+
+# Start recording if not already recording, otherwise stop recording.
     def toggle_recording(self):
         if not self.is_recording:
             self.start_recording()
         else:
             self.stop_recording()
 
+
+
+# Set recording state, update button states and text, initialize audio stream, and start recording thread.
     def start_recording(self):
         self.is_recording = True
         self.record_button.config(text="Recording...", state=tk.DISABLED)
@@ -113,11 +120,16 @@ class MusicApp:
         threading.Thread(target=self.record_audio).start()
         self.check_recording_status()
 
+
+# Continuously read audio data while recording and append to recorded frames.
     def record_audio(self):
         while self.is_recording:
             data = self.audio_stream.read(1024)
             self.recorded_frames.append(data)
 
+
+
+# Stop recording, update button states and text, stop audio stream, and save the recording.
     def stop_recording(self):
         self.is_recording = False
         self.record_button.config(text="Record", state=tk.NORMAL)
@@ -129,6 +141,10 @@ class MusicApp:
 
         self.save_recording()
 
+
+
+
+# Save recorded frames to a WAV file, create AudioSegment, and play the original audio.
     def save_recording(self):
         file_path = r'C:\Users\Aryan\Desktop\Codejam\Work\Codejam-main\Codejam-main\Poo fighters\src\song.wav'
         if file_path:
@@ -143,18 +159,32 @@ class MusicApp:
             self.play_original() 
         subprocess.run(['python', 'autotune.py']) 
 
+
+
+
+
+
+
+
+
+# Load audio for autotune pitch display and plot the audio signal.
     def display_autotune_pitch(self):
         sample_rate = 44100
         save_path = r'C:\Users\Aryan\Desktop\Codejam\Work\Codejam-main\Codejam-main\Poo fighters\src\song_pitch_corrected.wav'
         loaded_audio, sample_rate = librosa.load(save_path, sr=None)
         self.plot_audio_signal(loaded_audio, sample_rate)
-         
+
+
+
+# Load original audio for pitch display and plot the audio signal.         
     def display_original_pitch(self):
         sample_rate = 44100
         save_path = r'C:\Users\Aryan\Desktop\Codejam\Work\Codejam-main\Codejam-main\Poo fighters\src\song.wav'
         loaded_audio, sample_rate = librosa.load(save_path, sr=None)
         self.plot_audio_signal(loaded_audio, sample_rate)
 
+
+# Plot the audio signal with time on the x-axis, amplitude on the y-axis.
     def plot_audio_signal(self, signal,     sample_rate):
         time = np.arange(0, len(signal)) / sample_rate
         plt.plot(time, signal)
@@ -162,6 +192,8 @@ class MusicApp:
         plt.xlabel("Time (s)")
         plt.ylabel("Amplitude")
         plt.show()
+
+
 
     def play_autotune(self):
         # Specify the path to your autotuned audio file
@@ -177,6 +209,9 @@ class MusicApp:
         self.playback_thread = threading.Thread(target=self.play_audio, args=(autotuned_audio,))
         self.playback_thread.start()
 
+
+
+
     def play_original(self):
         # Specify the path to your autotuned audio file
         autotuned_file_path = r'C:\Users\Aryan\Desktop\Codejam\Work\Codejam-main\Codejam-main\Poo fighters\src\song.wav'
@@ -191,20 +226,39 @@ class MusicApp:
         self.playback_thread = threading.Thread(target=self.play_audio, args=(autotuned_audio,))
         self.playback_thread.start()
 
+
+
+
+
     def stop_playback(self):
         
         if self.is_playing and self.playback_thread.is_alive():
             self.playback_thread.join()  
             self.is_playing = False
 
+
+
+
+
+
     def play_audio(self, audio):
         self.is_playing = True
         play(audio)
+
+
+
+
+
 
     def autotune_audio(self, audio):
         #Add the code for autotuning audeo here, below is just sample code
         autotuned_audio = audio.speedup(playback_speed=1.5)  
         return autotuned_audio
+
+
+
+
+
 
     def check_recording_status(self):
        
@@ -217,5 +271,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = MusicApp(root)
     root.mainloop()
-
 
