@@ -3,131 +3,8 @@ from datetime import datetime
 from typing import List, Dict
 from midiutil import MIDIFile
 from pyo import *
-from random import choices, randint, randrange, random, sample
-from typing import List, Optional, Callable, Tuple
 
-Genome = List[int]
-Population = List[Genome]
-PopulateFunc = Callable[[], Population]
-FitnessFunc = Callable[[Genome], int]
-SelectionFunc = Callable[[Population, FitnessFunc], Tuple[Genome, Genome]]
-CrossoverFunc = Callable[[Genome, Genome], Tuple[Genome, Genome]]
-MutationFunc = Callable[[Genome], Genome]
-PrinterFunc = Callable[[Population, int, FitnessFunc], None]
-
-#genetic representation
-def generate_genome(length: int) -> Genome:
-    return choices([0, 1], k=length)
-
-
-#a function to generate new genomes
-def generate_population(size: int, genome_length: int) -> Population:
-    return [generate_genome(genome_length) for _ in range(size)]
-
-
-#natural selection  : single point crossover function : selection function
-def single_point_crossover(a: Genome, b: Genome) -> Tuple[Genome, Genome]:
-    if len(a) != len(b):
-        raise ValueError("Genomes a and b must be of same length")
-
-    length = len(a)
-    if length < 2:
-        return a, b
-
-    p = randint(1, length - 1)
-    return a[0:p] + b[p:], b[0:p] + a[p:]
-
-# mutation function : randomly changes bit in every genome
-def mutation(genome: Genome, num: int = 1, probability: float = 0.5) -> Genome:
-    for _ in range(num):
-        index = randrange(len(genome))
-        genome[index] = genome[index] if random() > probability else abs(genome[index] - 1)
-    return genome
-
-
-#fitness function
-def population_fitness(population: Population, fitness_func: FitnessFunc) -> int:
-    return sum([fitness_func(genome) for genome in population])
-
-
-def selection_pair(population: Population, fitness_func: FitnessFunc) -> Population:
-    return sample(
-        population=generate_weighted_distribution(population, fitness_func),
-        k=2
-    )
-
-
-def generate_weighted_distribution(population: Population, fitness_func: FitnessFunc) -> Population:
-    result = []
-
-    for gene in population:
-        result += [gene] * int(fitness_func(gene)+1)
-
-    return result
-
-
-def sort_population(population: Population, fitness_func: FitnessFunc) -> Population:
-    return sorted(population, key=fitness_func, reverse=True)
-
-
-def genome_to_string(genome: Genome) -> str:
-    return "".join(map(str, genome))
-
-
-def print_stats(population: Population, generation_id: int, fitness_func: FitnessFunc):
-    print("GENERATION %02d" % generation_id)
-    print("=============")
-    print("Population: [%s]" % ", ".join([genome_to_string(gene) for gene in population]))
-    print("Avg. Fitness: %f" % (population_fitness(population, fitness_func) / len(population)))
-    sorted_population = sort_population(population, fitness_func)
-    print(
-        "Best: %s (%f)" % (genome_to_string(sorted_population[0]), fitness_func(sorted_population[0])))
-    print("Worst: %s (%f)" % (genome_to_string(sorted_population[-1]),
-                              fitness_func(sorted_population[-1])))
-    print("")
-
-    return sorted_population[0]
-
-
-def run_evolution(
-        populate_func: PopulateFunc,
-        fitness_func: FitnessFunc,
-        fitness_limit: int,
-        selection_func: SelectionFunc = selection_pair,
-        crossover_func: CrossoverFunc = single_point_crossover,
-        mutation_func: MutationFunc = mutation,
-        generation_limit: int = 100,
-        printer: Optional[PrinterFunc] = None) \
-        -> Tuple[Population, int]:
-    population = populate_func()
-
-    i = 0
-    for i in range(generation_limit):
-        population = sorted(population, key=lambda genome: fitness_func(genome), reverse=True)
-
-        if printer is not None:
-            printer(population, i, fitness_func)
-
-        if fitness_func(population[0]) >= fitness_limit:
-            break
-
-        next_generation = population[0:2]
-
-        for j in range(int(len(population) / 2) - 1):
-            parents = selection_func(population, fitness_func)
-            offspring_a, offspring_b = crossover_func(parents[0], parents[1])
-            offspring_a = mutation_func(offspring_a)
-            offspring_b = mutation_func(offspring_b)
-            next_generation += [offspring_a, offspring_b]
-
-        population = next_generation
-
-    return population, i
-
-
-
-### ============================================================end of genetic algorithms================================================================
-
+from algorithms.genetic import generate_genome, Genome, selection_pair, single_point_crossover, mutation
 
 BITS_PER_NOTE = 4
 KEYS = ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"]
@@ -268,10 +145,6 @@ def save_genome_to_midi(filename: str, genome: Genome, num_bars: int, num_notes:
 @click.option("--num-mutations", default=2, prompt='Number of mutations:', type=int)
 @click.option("--mutation-probability", default=0.5, prompt='Mutations probability:', type=float)
 @click.option("--bpm", default=128, type=int)
-
-
-
-### __main__ function
 def main(num_bars: int, num_notes: int, num_steps: int, pauses: bool, key: str, scale: str, root: int,
          population_size: int, num_mutations: int, mutation_probability: float, bpm: int):
 
@@ -315,7 +188,7 @@ def main(num_bars: int, num_notes: int, num_steps: int, pauses: bool, key: str, 
         for e in events:
             e.play()
         s.start()
-        input("Here is the no. 1 hit.....")
+        input("here is the no1 hit …")
         s.stop()
         for e in events:
             e.stop()
@@ -326,14 +199,14 @@ def main(num_bars: int, num_notes: int, num_steps: int, pauses: bool, key: str, 
         for e in events:
             e.play()
         s.start()
-        input("here is the second best...")
+        input("here is the second best …")
         s.stop()
         for e in events:
             e.stop()
 
         time.sleep(1)
 
-        print("saving population mid...")
+        print("saving population midi …")
         for i, genome in enumerate(population):
             save_genome_to_midi(f"{folder}/{population_id}/{scale}-{key}-{i}.mid", genome, num_bars, num_notes, num_steps, pauses, key, scale, root, bpm)
         print("done")
@@ -345,4 +218,3 @@ def main(num_bars: int, num_notes: int, num_steps: int, pauses: bool, key: str, 
 
 if __name__ == '__main__':
     main()
-
