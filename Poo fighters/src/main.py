@@ -64,11 +64,15 @@ class MusicApp:
 
         # Play Autotune Button
         play_autotune_button = tk.Button(playback_frame, text="Play Autotune", command=self.play_autotune,bg="#910A67")
-        play_autotune_button.pack(side=tk.LEFT, padx=10)
+        play_autotune_button.place(x=400,y=-10)
 
         # Play Original Button
         play_original_button = tk.Button(playback_frame, text="Play Original", command=self.play_original,bg="#910A67")
         play_original_button.pack(side=tk.LEFT)
+
+        # Generate Melody Button
+        generate_melody_button = tk.Button(self.master, text="Generate Melody", command=self.generate_melody,bg="#910A67")
+        generate_melody_button.grid(row=0, column=2, padx=10, pady=25, sticky="ne")
 
         # Load GIF
         self.gif_path = "./pic.gif"  # Replace with the path to your GIF file
@@ -79,6 +83,10 @@ class MusicApp:
         self.gif_index = 0
         self.gif_object = self.canvas.create_image(100, 100, image=self.gif_frames[self.gif_index])
         self.animate_gif()
+
+
+    def generate_melody(self):
+        pass
     
     def animate_gif(self):
         self.gif_index = (self.gif_index + 1) % len(self.gif_frames)
@@ -209,3 +217,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = MusicApp(root)
     root.mainloop()
+
+
