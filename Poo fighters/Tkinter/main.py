@@ -5,6 +5,7 @@ import pyaudio
 import wave
 from pydub import AudioSegment
 from pydub.playback import play
+from subprocess import *
 
 class MusicApp:
     def __init__(self, master):
@@ -162,7 +163,13 @@ class MusicApp:
 
     def generate_melody(self):
         # logic to generate melody
-        pass
+        external_script_path = ".AI_Melody/mgen.py"
+        command = ["python", external_script_path]
+
+        # Run the external script
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        return result
 
 if __name__ == "__main__":
     root = tk.Tk()
