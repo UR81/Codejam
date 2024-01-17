@@ -86,7 +86,8 @@ class MusicApp:
 
 
     def generate_melody(self):
-        pass
+        external_script_path = "./AI_Melody/mgen.py"
+        subprocess.run(["python", external_script_path])
     
 
 # Increment gif index, update canvas with next frame, and schedule recursive animation.
